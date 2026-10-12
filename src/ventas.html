@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ventas — UpTienda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #081225;
+      --panel: rgba(18, 32, 55, 0.96);
+      --panel-soft: rgba(15, 28, 49, 0.92);
+      --text: #f8fafc;
+      --muted: #8aa4c2;
+      --border: rgba(255,255,255,0.12);
+      --accent-green: #2ad6a7;
+      --accent-blue: #5b8cff;
+      --shadow: 0 24px 50px rgba(0,0,0,0.25);
+    }
+
+    body {
+      background: radial-gradient(circle at top left, rgba(42,214,167,0.14), transparent 18%),
+                  radial-gradient(circle at top right, rgba(91,140,255,0.12), transparent 16%),
+                  var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      border-radius: 1.5rem;
+    }
+
+    .field-surface {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field-surface:focus {
+      outline: none;
+      border-color: rgba(42,214,167,0.85);
+      box-shadow: 0 0 0 4px rgba(42,214,167,0.12);
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+      padding: 0.8rem 1.1rem;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      transition: background 0.2s ease, transform 0.2s ease;
+      text-decoration: none;
+    }
+
+    .link-button:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-1px);
+    }
+
+    .table-modern th,
+    .table-modern td {
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .table-modern tbody tr:hover {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .table-modern th {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .suggestion-list {
+      position: absolute;
+      top: calc(100% + 0.75rem);
+      left: 0;
+      right: 0;
+      max-height: 14rem;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1.25rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.16);
+      z-index: 20;
+      display: none;
+    }
+
+    .suggestion-list.visible {
+      display: block;
+    }
+
+    .suggestion-item {
+      cursor: pointer;
+      padding: 0.85rem 1rem;
+      color: var(--text);
+    }
+
+    .suggestion-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-[color:var(--text)]">
+  <div id="ventasApp">
+    <main class="max-w-6xl mx-auto px-6 py-8">
+      <section class="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <a href="index.html" class="link-button mb-4">
+            <span class="text-lg">←</span>
+            <span>Volver al Dashboard</span>
+          </a>
+          <h1 class="text-4xl font-semibold tracking-tight">Módulo de Ventas</h1>
+          <p class="mt-2 text-sm text-[color:var(--muted)]">Registra ventas con rapidez en el estilo corporativo premium de UpTienda.</p>
+        </div>
+        <div class="rounded-3xl bg-[rgba(255,255,255,0.04)] border border-white/10 px-6 py-5 text-right">
+          <div class="text-xs uppercase tracking-[0.24em] text-[color:var(--muted)]">Total</div>
+          <div class="mt-3 text-4xl font-semibold text-[color:var(--accent-green)]" id="salesTotal">$0.00</div>
+        </div>
+      </section>
+
+      <div class="glass-card overflow-visible">
+        <div class="border-b border-white/10 px-6 py-5 bg-[rgba(255,255,255,0.03)]">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div class="text-sm uppercase tracking-[0.24em] text-[color:var(--muted)]">Nueva venta</div>
+              <div class="mt-1 text-xl font-semibold">Agrega productos al carrito</div>
+            </div>
+            <div class="text-sm text-[color:var(--muted)]">Selecciona un producto para autocompletar su precio.</div>
+          </div>
+        </div>
+
+        <div class="px-6 py-6">
+          <form id="saleForm" class="grid gap-6">
+            <div class="grid gap-4 lg:grid-cols-[2.4fr_1fr]">
+              <div class="relative">
+                <label class="block text-sm uppercase tracking-[0.18em] text-[color:var(--muted)] mb-2">Producto</label>
+                <input id="productInput" name="product" autocomplete="off" spellcheck="false" placeholder="Escribe o selecciona un producto"
+                  class="field-surface w-full rounded-3xl px-4 py-3 text-base placeholder:text-[color:var(--muted)]" />
+                <div id="productMatches" class="suggestion-list"></div>
+              </div>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label class="block text-sm uppercase tracking-[0.18em] text-[color:var(--muted)] mb-2">Cantidad</label>
+                  <input name="qty" type="number" value="1" min="1"
+                    class="field-surface w-full rounded-3xl px-4 py-3 text-base" />
+                </div>
+                <div>
+                  <label class="block text-sm uppercase tracking-[0.18em] text-[color:var(--muted)] mb-2">Precio</label>
+                  <input name="price" type="number" step="0.01" min="0"
+                    class="field-surface w-full rounded-3xl px-4 py-3 text-base" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Selector de método de pago y botón de agregar -->
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_auto] items-center">
+              <div>
+                <label class="block text-sm uppercase tracking-[0.18em] text-[color:var(--muted)] mb-2">Método de Pago</label>
+                <select name="paymentMethod" class="field-surface w-full rounded-3xl px-4 py-3 text-base bg-[#0f172a]">
+                  <option value="Efectivo" selected>Efectivo</option>
+                  <option value="Tarjeta">Tarjeta</option>
+                </select>
+              </div>
+              <div class="flex justify-end sm:mt-6">
+                <button type="submit" class="inline-flex items-center justify-center rounded-3xl bg-[color:var(--accent-green)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-slate-950 transition hover:bg-[#22c094]">
+                  Agregar venta
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <section class="glass-card mt-8 overflow-hidden">
+        <div class="border-b border-white/10 px-6 py-5 bg-[rgba(255,255,255,0.03)] flex flex-col md:flex-row items-center justify-between gap-4">
+          <h2 class="text-lg font-semibold">Historial de ventas</h2>
+          
+          <!-- Bloque integrado de cálculo de efectivo y cambio exacto -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs uppercase tracking-wider text-[color:var(--muted)]">Efectivo Ingresado:</span>
+              <input id="cashGivenInput" type="number" step="0.01" min="0" placeholder="$0.00" class="field-surface w-28 rounded-2xl px-3 py-1.5 text-sm text-right font-semibold" />
+            </div>
+            <div class="flex items-center gap-2 bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-2xl">
+              <span class="text-xs uppercase tracking-wider text-[color:var(--muted)]">Cambio:</span>
+              <span id="changeOutput" class="text-sm font-bold text-[color:var(--accent-green)]">$0.00</span>
+            </div>
+            <button id="finishSaleBtn" type="button" class="inline-flex items-center justify-center rounded-3xl bg-rose-500/20 border border-rose-500/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-rose-300 transition hover:bg-rose-500/30">
+              FINALIZAR VENTA
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto px-6 py-6">
+          <table class="w-full min-w-[32rem] table-auto text-sm text-[color:var(--text)] table-modern">
+            <thead class="text-left text-[color:var(--muted)] uppercase text-xs tracking-[0.18em]">
+              <tr>
+                <th class="px-3 py-3">PRODUCTO</th>
+                <th class="px-3 py-3 text-center">CANTIDAD</th>
+                <th class="px-3 py-3 text-right">PRECIO</th>
+                <th class="px-3 py-3 text-right">TOTAL</th>
+                <th class="px-3 py-3 text-right">MÉTODO</th>
+                <th class="px-3 py-3 text-right"></th>
+              </tr>
+            </thead>
+            <tbody id="salesList" class="divide-y divide-white/10"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./js/pages.js"></script>
+</body>
+</html>

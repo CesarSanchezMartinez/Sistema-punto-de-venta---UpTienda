@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script type="text/javascript">
+     (function(){
+        emailjs.init({
+          publicKey: "egSnLzAWOIejRkAl4",
+        });
+    })();
+  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — UpTienda</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div class="w-full max-w-sm bg-white p-6 rounded-lg shadow">
+    
+    <!-- Formulario de Iniciar Sesión -->
+    <div id="loginSection">
+      <h1 class="text-xl font-semibold mb-4">Iniciar Sesión</h1>
+      <form id="loginForm">
+        <label class="block text-sm">Usuario</label>
+        <input name="username" required class="mt-1 w-full border p-2 rounded mb-3" />
+        <label class="block text-sm">Contraseña</label>
+        <input name="password" type="password" required class="mt-1 w-full border p-2 rounded mb-4" />
+        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Entrar</button>
+      </form>
+      
+      <div class="mt-4 text-center text-sm flex justify-between">
+        <button type="button" onclick="showRegister()" class="text-blue-600 hover:underline">Registrar cuenta</button>
+        <button type="button" onclick="showRecovery()" class="text-gray-600 hover:underline">Olvidé mi contraseña</button>
+      </div>
+    </div>
+
+    <!-- Formulario de Registro -->
+    <div id="registerSection" class="hidden">
+      <h1 class="text-xl font-semibold mb-4">Registro por Primera Vez</h1>
+      <form id="registerForm">
+        <label class="block text-sm">Nuevo Usuario</label>
+        <input name="regUsername" required class="mt-1 w-full border p-2 rounded mb-3" />
+        <label class="block text-sm">Correo Electrónico</label>
+        <input name="regEmail" type="email" required class="mt-1 w-full border p-2 rounded mb-3" placeholder="correo@ejemplo.com" />
+        <label class="block text-sm">Contraseña</label>
+        <input name="regPassword" type="password" required class="mt-1 w-full border p-2 rounded mb-4" />
+        <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Registrarse</button>
+      </form>
+      <div class="mt-4 text-center text-sm">
+        <button type="button" onclick="showLogin()" class="text-blue-600 hover:underline">Volver al Login</button>
+      </div>
+    </div>
+
+    <!-- Formulario de Recuperación -->
+    <div id="recoverySection" class="hidden">
+      <h1 class="text-xl font-semibold mb-4">Recuperar Contraseña</h1>
+      <form id="recoveryForm">
+        <label class="block text-sm">Correo Electrónico Registrado</label>
+        <input name="recEmail" type="email" required class="mt-1 w-full border p-2 rounded mb-3" placeholder="correo@ejemplo.com" />
+        <label class="block text-sm">Nueva Contraseña</label>
+        <input name="newPassword" type="password" required class="mt-1 w-full border p-2 rounded mb-4" />
+        <button type="submit" class="w-full bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 transition">Restablecer Contraseña</button>
+      </form>
+      <div class="mt-4 text-center text-sm">
+        <button type="button" onclick="showLogin()" class="text-blue-600 hover:underline">Volver al Login</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showRegister() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('registerSection').classList.remove('hidden');
+    }
+    function showRecovery() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('recoverySection').classList.remove('hidden');
+    }
+    function showLogin() {
+      document.getElementById('registerSection').classList.add('hidden');
+      document.getElementById('recoverySection').classList.add('hidden');
+      document.getElementById('loginSection').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // 1. Iniciar Sesión buscando en la lista de usuarios
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+
+          const username = loginForm.username.value.trim();
+          const password = loginForm.password.value.trim();
+
+          if (!username || !password) {
+            alert('Por favor, completa todos los campos.');
+            return;
+          }
+
+          // Obtenemos la lista de usuarios guardados
+          const users = JSON.parse(localStorage.getItem('uptienda_users')) || [];
+
+          // Buscamos si alguno coincide en usuario y contraseña
+          const validUser = users.find(u => u.username === username && u.password === password);
+
+          if (validUser) {
+            localStorage.setItem('uptienda_user', validUser.username);
+            alert('¡Inicio de sesión exitoso!');
+            window.location.href = 'index.html';
+          } else {
+            alert('Usuario o contraseña incorrectos. Verifica tus datos.');
+          }
+        }, true);
+      }
+
+      // 2. Registro acumulativo (permite varios correos/usuarios sin sobreescribir)
+      const registerForm = document.getElementById('registerForm');
+      if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+
+          const username = registerForm.regUsername.value.trim();
+          const email = registerForm.regEmail.value.trim();
+          const password = registerForm.regPassword.value.trim();
+
+          if (!username || !email || !password) {
+            alert('Por favor, completa todos los campos de registro.');
+            return;
+          }
+
+          // Obtenemos la lista actual de usuarios
+          let users = JSON.parse(localStorage.getItem('uptienda_users')) || [];
+
+          // Validamos si el correo ya está registrado en la lista
+          const emailExists = users.some(u => u.email === email);
+          if (emailExists) {
+            alert('Este correo electrónico ya se encuentra registrado. Utiliza otro.');
+            return;
+          }
+
+          // Agregamos el nuevo usuario a la lista
+          users.push({ username, email, password });
+          localStorage.setItem('uptienda_users', JSON.stringify(users));
+
+          const templateParams = {
+            email: email,
+            to_email: email,
+            user_name: username,
+            login_url: window.location.origin + '/login.html'
+          };
+
+          emailjs.send('service_efij1ul', 'template_xaba6qe', templateParams)
+            .then((response) => {
+              console.log('Correo de bienvenida enviado con éxito', response.status, response.text);
+              alert('¡Cuenta registrada exitosamente y correo de bienvenida enviado!');
+              showLogin();
+            })
+            .catch((error) => {
+              console.error('Error detallado al enviar correo de bienvenida:', error);
+              alert('Error detallado al enviar correo: ' + (error.text || JSON.stringify(error)));
+              showLogin();
+            });
+        }, true);
+      }
+
+      // 3. Recuperación de Contraseña basada en la lista
+      const recoveryForm = document.getElementById('recoveryForm');
+      if (recoveryForm) {
+        recoveryForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+
+          const email = recoveryForm.recEmail.value.trim();
+          const newPassword = recoveryForm.newPassword.value.trim();
+
+          if (!email || !newPassword) {
+            alert('Por favor, completa todos los campos.');
+            return;
+          }
+
+          let users = JSON.parse(localStorage.getItem('uptienda_users')) || [];
+          const userIndex = users.findIndex(u => u.email === email);
+
+          if (userIndex !== -1) {
+            users[userIndex].password = newPassword;
+            localStorage.setItem('uptienda_users', JSON.stringify(users));
+            alert('¡Contraseña restablecida con éxito! Ya puedes iniciar sesión.');
+            showLogin();
+          } else {
+            alert('El correo electrónico no se encuentra registrado en el sistema.');
+          }
+        }, true);
+      }
+
+      console.log("Cesar Sanchez Martinez 24598 4C");
+    });
+  </script>
+</body>
+</html>

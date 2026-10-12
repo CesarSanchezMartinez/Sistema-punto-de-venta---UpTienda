@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>UpTienda — Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #081225;
+      --panel: rgba(18, 32, 55, 0.96);
+      --panel-soft: rgba(15, 28, 49, 0.82);
+      --text: #f8fafc;
+      --muted: #8aa4c2;
+      --border: rgba(255,255,255,0.1);
+      --accent-green: #2ad6a7;
+      --accent-violet: #7f5bff;
+      --accent-red: #ff5c7c;
+      --shadow: 0 28px 60px rgba(0, 0, 0, 0.25);
+    }
+    body {
+      background: radial-gradient(circle at top left, rgba(42,214,167,0.14), transparent 18%),
+                  radial-gradient(circle at top right, rgba(127,91,255,0.12), transparent 16%),
+                  var(--bg);
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    .no-scrollbar {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .glass-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+    }
+    .hover-soft:hover {
+      background: rgba(255,255,255,0.06);
+    }
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    body::-webkit-scrollbar {
+      width: 0.35rem;
+    }
+    body::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+    }
+    body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen overflow-y-auto text-[color:var(--text)] font-sans flex flex-col">
+  <header class="border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-3xl bg-white/10 flex items-center justify-center ring-1 ring-white/10">
+          <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9V5h14v4"/><path d="M5 9h14v10H5z"/></svg>
+        </div>
+        <div>
+          <div class="text-xl font-semibold">UpTienda</div>
+          <div class="text-xs uppercase tracking-[0.25em] text-[color:var(--muted)]">Sistema de punto de venta</div>
+        </div>
+      </div>
+
+      <div class="flex-1 flex flex-col items-center text-center gap-1 md:flex-row md:justify-center md:text-left">
+        <div>
+          <div id="headerClock" class="text-sm sm:text-base font-semibold"></div>
+          <div id="headerDate" class="text-xs uppercase tracking-[0.18em] text-[color:var(--muted)]"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-4">
+        <div class="rounded-2xl bg-white/5 px-4 py-3 flex items-center gap-3 border border-white/10">
+          <span id="onlineStatus" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span id="onlineText" class="text-sm text-[color:var(--accent-green)]">En línea</span>
+        </div>
+        <div class="rounded-2xl bg-white/5 px-4 py-3 flex items-center gap-3 border border-white/10">
+          <div id="userAvatar" class="w-10 h-10 rounded-full bg-[#1e304d] flex items-center justify-center text-white font-bold">A</div>
+          <div class="text-left">
+            <div id="userName" class="text-sm font-semibold">Admin</div>
+            <div id="userShift" class="text-xs text-[color:var(--muted)]">Turno mañana</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="dashboardApp" class="flex-1 max-w-7xl mx-auto px-6 py-6 overflow-visible">
+    <section class="grid gap-6 md:grid-cols-2">
+      <a href="ventas.html" class="glass-card group rounded-3xl p-6 shadow-xl border border-white/10 transition hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(0,0,0,0.35)] h-full min-h-[24rem] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <div class="grid place-items-center w-14 h-14 rounded-3xl bg-white/10 text-white">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l1.5 9h9l1.5-9"/><path d="M6 9h12"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+          </div>
+          <span class="tag-pill bg-emerald-500/15 text-emerald-300 border border-emerald-400/20">Activo</span>
+        </div>
+        <div class="mt-6 space-y-3">
+          <h2 class="text-2xl font-semibold">Módulo de Ventas</h2>
+          <p class="text-[color:var(--muted)]">Punto de venta y caja registradora</p>
+        </div>
+        <div class="mt-6 text-sm text-[color:var(--muted)]">
+          <div class="uppercase tracking-[0.2em] text-[color:var(--muted)]">Ventas realizadas hoy</div>
+          <div id="cardVentasCount" class="mt-2 text-lg font-semibold">0</div>
+        </div>
+      </a>
+
+      <a href="inventario.html" class="glass-card group rounded-3xl p-6 shadow-xl border border-white/10 transition hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(0,0,0,0.35)] h-full min-h-[24rem] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <div class="grid place-items-center w-14 h-14 rounded-3xl bg-white/10 text-white">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+          </div>
+          <span class="tag-pill bg-violet-500/15 text-violet-300 border border-violet-400/20">Actualizado</span>
+        </div>
+        <div class="mt-6 space-y-3">
+          <h2 class="text-2xl font-semibold">Control de Inventario</h2>
+          <p class="text-[color:var(--muted)]">Gestión de productos y stock</p>
+        </div>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 text-sm text-[color:var(--muted)]">
+          <div>
+            <div class="uppercase tracking-[0.2em] text-[color:var(--muted)]">Productos</div>
+            <div id="cardProductsCount" class="mt-2 text-lg font-semibold">0</div>
+          </div>
+          <div>
+            <div class="uppercase tracking-[0.2em] text-[color:var(--muted)]">Stock total</div>
+            <div id="cardTotalStockCount" class="mt-2 text-lg font-semibold">0</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="finanzas.html" class="glass-card group rounded-3xl p-6 shadow-xl border border-white/10 transition hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(0,0,0,0.35)] h-full min-h-[24rem] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <div class="grid place-items-center w-14 h-14 rounded-3xl bg-white/10 text-white">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18"/><path d="M3 15h18"/><path d="M12 3v18"/></svg>
+          </div>
+          <span class="tag-pill bg-emerald-500/15 text-emerald-300 border border-emerald-400/20">Sincronizado</span>
+        </div>
+        <div class="mt-6 space-y-3">
+          <h2 class="text-2xl font-semibold">Reportes y Finanzas</h2>
+          <p class="text-[color:var(--muted)]">Análisis financiero y estadísticas</p>
+        </div>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 text-sm text-[color:var(--muted)]">
+          <div>
+            <div class="uppercase tracking-[0.2em] text-[color:var(--muted)]">Ventas de hoy</div>
+            <div id="cardFinancesToday" class="mt-2 text-lg font-semibold">S/. 0.00</div>
+          </div>
+          <div>
+        
+          </div>
+        </div>
+      </a>
+
+      <a id="logoutCard" href="login.html" class="glass-card group rounded-3xl p-6 shadow-xl border border-white/10 transition hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(0,0,0,0.35)] h-full min-h-[24rem] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <div class="grid place-items-center w-14 h-14 rounded-3xl bg-white/10 text-white">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M12 11l4-4m0 0l-4-4m4 4H8"/></svg>
+          </div>
+          <span class="tag-pill bg-danger/15 text-red-300 border border-red-400/20">Sesión activa</span>
+        </div>
+        <div class="mt-6 space-y-3">
+          <h2 class="text-2xl font-semibold">Cerrar Sesión</h2>
+          <p class="text-[color:var(--muted)]">Salir del sistema de forma segura</p>
+        </div>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 text-sm text-[color:var(--muted)]">
+          <div>
+            <div class="uppercase tracking-[0.2em] text-[color:var(--muted)]">Sesión iniciada</div>
+            <div id="sessionStartTime" class="mt-2 text-lg font-semibold">--:--</div>
+          </div>
+          <div>
+            <div class="uppercase tracking-[0.2em] text-[color:var(--muted)]">Operador</div>
+            <div id="sessionOperator" class="mt-2 text-lg font-semibold">Admin</div>
+          </div>
+        </div>
+      </a>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/10 py-4">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between text-xs text-[color:var(--muted)]">
+      <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Sistema operativo</div>
+      <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-transparent border border-white/10"></span>Conexión segura SSL</div>
+      <div>UpTienda POS v2.4.1 – © 2025 Universidad – Todos los derechos reservados</div>
+    </div>
+  </footer>
+
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/pages.js"></script>
+</body>
+</html>
